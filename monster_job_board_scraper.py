@@ -20,8 +20,8 @@ page = urlopen(url)
 html = page.read().decode('utf-8')
 soup = BeautifulSoup(html, 'html.parser')
 # print(soup)
-job_titles_list = soup.select('.card-header a')
+job_titles_html = soup.select('.card-header a')
 # print(job_titles_list)
-for i in range(len(job_titles_list)):
-    job_title = job_titles_list[i].get_text()
+for job_titles in job_titles_html:
+    job_title = job_titles.get_text()
     print(job_title)
