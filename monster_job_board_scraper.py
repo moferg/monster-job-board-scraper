@@ -4,6 +4,7 @@
 
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
+import mechanicalsoup
 
 # print('Welcome to the Monster Job Board Scraper!')
 # print('This script with scrape the Monster website and return job postings.')
@@ -20,8 +21,30 @@ page = urlopen(url)
 html = page.read().decode('utf-8')
 soup = BeautifulSoup(html, 'html.parser')
 # print(soup)
-job_titles_html = soup.select('.card-header a')
-# print(job_titles_list)
-for job_titles in job_titles_html:
-    job_title = job_titles.get_text()
-    print(job_title)
+# print(type(soup))
+
+job_titles_html = soup.find_all('h2', class_ = 'title')
+# print(job_titles_html)
+job_titles_text = []
+for job_title in job_titles_html:
+    job_titles_text.append(job_title.get_text())
+# print(job_titles_text)
+
+browser = mechanicalsoup.StatefulBrowser()
+browser.open(url)
+links = browser.links()
+
+link_text = []
+# print(links)
+for link in links:
+    link_text.append(link.get_text())
+# print(link_text)
+
+job_titles = []
+for job_title in job_titles_text:
+    job_titles.append(job_title.strip('\r\n'))
+links = []
+for link in link_text:
+    links.append(link.strip('\r\n'))
+print(job_titles)
+print(links)
