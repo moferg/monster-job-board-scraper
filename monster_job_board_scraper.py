@@ -5,6 +5,7 @@
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import mechanicalsoup
+from mechanicalsoup.utils import LinkNotFoundError
 
 # print('Welcome to the Monster Job Board Scraper!')
 # print('This script with scrape the Monster website and return job postings.')
@@ -32,11 +33,11 @@ for job_title in job_titles_html:
 
 browser = mechanicalsoup.StatefulBrowser()
 browser.open(url)
-links = browser.links()
+links_all = browser.links()
+# print(links_all)
 
 link_text = []
-# print(links)
-for link in links:
+for link in links_all:
     link_text.append(link.get_text())
 # print(link_text)
 
@@ -46,5 +47,37 @@ for job_title in job_titles_text:
 links = []
 for link in link_text:
     links.append(link.strip('\r\n'))
-print(job_titles)
-print(links)
+# print(job_titles)
+# print(links)
+
+job_links_text = []
+for link in links:
+    for job_title in job_titles:
+        if link == job_title:
+            job_links_text.append(link)
+# print(job_links_text)
+
+job_links = []
+for link in links_all:
+    for job_link in job_links_text:
+        if link.get_text().strip('\r\n') == job_link:
+            job_links.append(link)
+            # print(job_links)
+# print(job_links)
+
+job_link_hrefs = []
+for link in job_links:
+    job_link_hrefs.append(link.get('href'))
+    job_link_hrefs = list(dict.fromkeys(job_link_hrefs))
+# print(job_link_hrefs)
+
+job_descriptions = []
+for href in job_link_hrefs:
+    try:
+        browser.open(href)
+        job_description = browser.get_current_page().find('div', class_ = 'job-description')
+        job_descriptions.append(job_description.get_text())
+    except LinkNotFoundError:
+        print('There was a LinkNotFoundError')
+ 
+print(job_descriptions)
